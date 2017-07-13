@@ -7,19 +7,20 @@ if [[ ! -f $BOOKMARKS_FILE ]]; then
 fi
 
 function mark() {
-    echo $@ : $(pwd) >> $BOOKMARKS_FILE
+    echo "$(pwd)" >> $BOOKMARKS_FILE
 }
 
 fzfcmd() {
-   [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+   echo "fzf --height 20% --reverse"
 }
 
 function jump() {
     local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
-        local jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#$HOME#")
+        local jumpdir=$(echo "${jumpline}" | sed "s#~#$HOME#")
         perl -p -i -e "s#${jumpline}\n##g" $BOOKMARKS_FILE
-        cd "${jumpdir}" && echo ${jumpline} >> $BOOKMARKS_FILE
+        clear
+        cd "${jumpdir}" && echo "${jumpline}" >> $BOOKMARKS_FILE
     fi
 }
 
